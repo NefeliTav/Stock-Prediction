@@ -1,9 +1,9 @@
 import plotly.graph_objects as go
-import plotly.express as px
 import math
+import sklearn
 from sklearn.metrics import mean_squared_error
-import time
 from sklearn.preprocessing import MinMaxScaler
+import time
 import numpy as np
 import pandas as pd
 import torch
@@ -17,16 +17,58 @@ filepath = '../dataset/TSLA.csv'
 df = pd.read_csv(filepath)
 print(df.head())
 
-# plot data
+'''
+# historical view of the closing price
 
 sns.set_style("darkgrid")
 plt.figure(figsize=(15, 9))
 plt.plot(df[['Close']])
-plt.xticks(range(0, df.shape[0], 500), df['Date'].loc[::500], rotation=45)
-plt.title("TESLA Stock Price", fontsize=18, fontweight='bold')
+plt.xticks(range(0, df.shape[0], 250), df['Date'].loc[::250], rotation=45)
+plt.title("Closing Price of TESLA", fontsize=18, fontweight='bold')
 plt.xlabel('Date', fontsize=18)
 plt.ylabel('Close Price (USD)', fontsize=18)
+plt.tight_layout()
 plt.show()
+
+# volume of stock being traded each day
+
+sns.set_style("darkgrid")
+plt.figure(figsize=(15, 9))
+plt.plot(df[['Volume']])
+plt.xticks(range(0, df.shape[0], 250), df['Date'].loc[::250], rotation=45)
+plt.title("Sales Volume for TESLA", fontsize=18, fontweight='bold')
+plt.xlabel('Date', fontsize=18)
+plt.ylabel('Volume', fontsize=18)
+plt.tight_layout()
+plt.show()
+
+# daily return
+
+df['Daily Return'] = df['Adj Close'].pct_change()
+sns.set_style("darkgrid")
+plt.figure(figsize=(15, 9))
+plt.plot(df[['Daily Return']])
+plt.xticks(range(0, df.shape[0], 250), df['Date'].loc[::250], rotation=45)
+plt.title("Daily Return for TESLA", fontsize=18, fontweight='bold')
+plt.xlabel('Date', fontsize=18)
+plt.ylabel('Daily Return', fontsize=18)
+plt.tight_layout()
+plt.show()
+
+# moving average
+
+ma_day = [10, 20, 50]
+for ma in ma_day:
+    column_name = f"MA for {ma} days"
+    df[column_name] = df['Adj Close'].rolling(ma).mean()
+df[['Adj Close', 'MA for 10 days', 'MA for 20 days',
+    'MA for 50 days']].plot()
+plt.xticks(range(0, df.shape[0], 250), df['Date'].loc[::250], rotation=45)
+plt.title("TESLA", fontsize=18, fontweight='bold')
+plt.xlabel('Date', fontsize=18)
+plt.tight_layout()
+plt.show()
+'''
 
 # normalize data
 
@@ -78,7 +120,7 @@ num_layers = 2
 output_dim = 1
 num_epochs = 100
 
-# train model
+# LSTM
 
 
 class LSTM(nn.Module):
@@ -106,6 +148,7 @@ model = LSTM(input_dim=input_dim, hidden_dim=hidden_dim,
 criterion = torch.nn.MSELoss(reduction='mean')
 optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
 #optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+#optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.1, weight_decay=1e-5)
 
 hist = np.zeros(num_epochs)
 start_time = time.time()
