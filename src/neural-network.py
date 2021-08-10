@@ -1,3 +1,5 @@
+import os
+import datetime
 import plotly.graph_objects as go
 import math
 import sklearn
@@ -15,9 +17,26 @@ import seaborn as sns
 
 filepath = '../dataset/TSLA.csv'
 df = pd.read_csv(filepath)
-print(df.head())
 
-'''
+
+def to_days(then):
+    now = datetime.date.today()
+    date_time_obj = datetime.datetime.strptime(then, '%Y-%m-%d').date()
+    diff = (now - date_time_obj)
+    diff = str(diff).split(' ')
+    return int(diff[0])
+
+
+df['Date'] = df['Date'].astype(str)
+df['Days'] = df['Date']
+row = 0
+for i in df['Date']:
+    df.loc[row, 'Days'] = to_days(df['Date'][row])
+    row += 1
+print(df.head())
+print()
+
+
 # historical view of the closing price
 
 sns.set_style("darkgrid")
@@ -62,17 +81,17 @@ for ma in ma_day:
     column_name = f"MA for {ma} days"
     df[column_name] = df['Adj Close'].rolling(ma).mean()
 df[['Adj Close', 'MA for 10 days', 'MA for 20 days',
-    'MA for 50 days']].plot()
+    'MA for 50 days']].plot(figsize=(15, 9))
 plt.xticks(range(0, df.shape[0], 250), df['Date'].loc[::250], rotation=45)
 plt.title("TESLA", fontsize=18, fontweight='bold')
 plt.xlabel('Date', fontsize=18)
 plt.tight_layout()
 plt.show()
-'''
 
+df = df.drop('Date', axis=1)
 # normalize data
 
-price = df[['Close']]
+price = df.loc[:, ['Close']]
 scaler = MinMaxScaler(feature_range=(-1, 1))
 price['Close'] = scaler.fit_transform(price['Close'].values.reshape(-1, 1))
 
@@ -106,6 +125,7 @@ print('x_train.shape = ', x_train.shape)
 print('y_train.shape = ', y_train.shape)
 print('x_test.shape = ', x_test.shape)
 print('y_test.shape = ', y_test.shape)
+print()
 
 x_train = torch.from_numpy(x_train).type(torch.Tensor)
 x_test = torch.from_numpy(x_test).type(torch.Tensor)
@@ -119,6 +139,7 @@ hidden_dim = 32
 num_layers = 2
 output_dim = 1
 num_epochs = 100
+
 
 # LSTM
 
@@ -146,8 +167,8 @@ class LSTM(nn.Module):
 model = LSTM(input_dim=input_dim, hidden_dim=hidden_dim,
              output_dim=output_dim, num_layers=num_layers)
 criterion = torch.nn.MSELoss(reduction='mean')
+#criterion = nn.CrossEntropyLoss()
 optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
-#optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 #optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.1, weight_decay=1e-5)
 
 hist = np.zeros(num_epochs)
@@ -165,6 +186,7 @@ for t in range(num_epochs):
     loss.backward()
     optimiser.step()
 
+print()
 training_time = time.time()-start_time
 print("Training time: {}".format(training_time))
 
@@ -291,6 +313,7 @@ optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
 hist = np.zeros(num_epochs)
 start_time = time.time()
 gru = []
+print()
 
 for t in range(num_epochs):
     y_train_pred = model(x_train)
@@ -302,7 +325,7 @@ for t in range(num_epochs):
     optimiser.zero_grad()
     loss.backward()
     optimiser.step()
-
+print()
 training_time = time.time()-start_time
 print("Training time: {}".format(training_time))
 
@@ -403,4 +426,7 @@ lstm = pd.DataFrame(lstm, columns=['LSTM'])
 gru = pd.DataFrame(gru, columns=['GRU'])
 result = pd.concat([lstm, gru], axis=1, join='inner')
 result.index = ['Train RMSE', 'Test RMSE', 'Train Time']
+print()
+
 print(result)
+print()
