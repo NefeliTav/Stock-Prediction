@@ -47,9 +47,7 @@ def preprocess():
 
     x_train = torch.from_numpy(x_train).type(torch.Tensor)
     x_test = torch.from_numpy(x_test).type(torch.Tensor)
-    y_train_lstm = torch.from_numpy(y_train).type(torch.Tensor)
-    y_test_lstm = torch.from_numpy(y_test).type(torch.Tensor)
-    y_train_gru = torch.from_numpy(y_train).type(torch.Tensor)
-    y_test_gru = torch.from_numpy(y_test).type(torch.Tensor)
+    y_train = torch.from_numpy(y_train).type(torch.Tensor)
+    y_test = torch.from_numpy(y_test).type(torch.Tensor)
 
-    return x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gru, scaler, price, lookback
+    return x_train, x_test, y_train, y_test, scaler, price, lookback

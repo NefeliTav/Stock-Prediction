@@ -1,21 +1,16 @@
-import plotly.graph_objects as go
-import math
-from sklearn.metrics import mean_squared_error
-import time
-import numpy as np
 import pandas as pd
-import torch
-import torch.nn as nn
 from preprocess_data import preprocess
 from LSTM_model import train_LSTM
 from GRU_model import train_GRU
+from MLP_model import train_MLP
 
 
-def main():
-    x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gru, scaler, price, lookback = preprocess()
-    lstm = train_LSTM(x_train, x_test, y_train_lstm, y_test_lstm,
+if __name__ == "__main__":
+    x_train, x_test, y_train, y_test, scaler, price, lookback = preprocess()
+    '''
+    lstm = train_LSTM(x_train, x_test, y_train, y_test,
                       y_train_gru, y_test_gru, scaler, price, lookback)
-    gru = train_GRU(x_train, x_test, y_train_lstm, y_test_lstm,
+    gru = train_GRU(x_train, x_test, y_train, y_test,
                     y_train_gru, y_test_gru, scaler, price, lookback)
 
     lstm = pd.DataFrame(lstm, columns=['LSTM'])
@@ -25,6 +20,5 @@ def main():
     print()
     print(result)
     print()
-
-
-main()
+    '''
+    mlp = train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback)

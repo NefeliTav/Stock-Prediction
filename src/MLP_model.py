@@ -6,45 +6,60 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from typing import Callable
 
-
-input_dim = 1
-hidden_dim = 32
-num_layers = 3
-output_dim = 1
 num_epochs = 100
 
 
-# LSTM
+class MLP2D(nn.Module):
+    def __init__(self,
+                 num_layers: int,
+                 hidden_dim: int,
+                 activation: Callable[[torch.Tensor], torch.Tensor]
+                 ) -> None:
+        super().__init__()
 
-class LSTM(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
-        super(LSTM, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
+        self.first_layer = nn.Linear(in_features=2,
+                                     out_features=hidden_dim)
 
-        self.lstm = nn.LSTM(input_dim, hidden_dim,
-                            num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, output_dim)
+        # A list of modules: automatically exposes nested parameters to optimize.
+        self.layers = nn.ModuleList()
+        # Parameters contained in a normal python list are not returned by model.parameters()
+        for i in range(num_layers):
+            self.layers.append(
+                nn.Linear(in_features=hidden_dim, out_features=hidden_dim)
+            )
+        self.activation = activation
 
-    def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(
-            0), self.hidden_dim).requires_grad_()
-        c0 = torch.zeros(self.num_layers, x.size(
-            0), self.hidden_dim).requires_grad_()
-        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
-        out = self.fc(out[:, -1, :])
-        return out
+        self.last_layer = nn.Linear(in_features=hidden_dim,
+                                    out_features=1)
+
+    def forward(self, meshgrid: torch.Tensor) -> torch.Tensor:
+        """
+        Applies transformations to each (x, y) independently 
+
+        :param meshgrid: tensor of dimensions [..., 2], where ... means any number of dims
+        """
+        out = meshgrid
+
+        # First linear layer, transforms the hidden dimensions from 2 (the coordinates) to `hidden_dim`
+        out = self.first_layer(out)
+        for layer in self.layers:    # Apply `k` (linear, activation) layer
+            out = layer(out)
+            out = self.activation(out)
+        # Last linear layer to bring the `hiddem_dim` features back to the 2 coordinates x, y
+        out = self.last_layer(out)
+
+        return out.squeeze(-1)
 
 
-def train_LSTM(x_train, x_test, y_train, y_test, scaler, price, lookback):
-    model = LSTM(input_dim=input_dim, hidden_dim=hidden_dim,
-                 output_dim=output_dim, num_layers=num_layers)
+def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
+    model = MLP2D(num_layers=3,
+                  hidden_dim=10,
+                  activation=torch.nn.functional.relu)
     criterion = torch.nn.MSELoss(reduction='mean')
-    #criterion = nn.CrossEntropyLoss()
     optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
-    #optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.1, weight_decay=1e-5)
-    #optimiser = torch.optim.LBFGS(model.parameters(), lr=0.01)
+
     hist = np.zeros(num_epochs)
     start_time = time.time()
     lstm = []

@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from preprocess_data import preprocess
 
 
 input_dim = 1
@@ -35,7 +34,7 @@ class GRU(nn.Module):
         return out
 
 
-def train_GRU(x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gru, scaler, price, lookback):
+def train_GRU(x_train, x_test,  y_train, y_test, scaler, price, lookback):
     model = GRU(input_dim=input_dim, hidden_dim=hidden_dim,
                 output_dim=output_dim, num_layers=num_layers)
     criterion = torch.nn.MSELoss(reduction='mean')
@@ -49,7 +48,7 @@ def train_GRU(x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gr
     for t in range(num_epochs):
         y_train_pred = model(x_train)
 
-        loss = criterion(y_train_pred, y_train_gru)
+        loss = criterion(y_train_pred, y_train)
         print("Epoch ", t, "MSE: ", loss.item())
         hist[t] = loss.item()
 
@@ -63,16 +62,16 @@ def train_GRU(x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gr
     predict = pd.DataFrame(scaler.inverse_transform(
         y_train_pred.detach().numpy()))
     original = pd.DataFrame(
-        scaler.inverse_transform(y_train_gru.detach().numpy()))
+        scaler.inverse_transform(y_train.detach().numpy()))
 
     # make predictions
     y_test_pred = model(x_test)
 
     # invert predictions
     y_train_pred = scaler.inverse_transform(y_train_pred.detach().numpy())
-    y_train = scaler.inverse_transform(y_train_gru.detach().numpy())
+    y_train = scaler.inverse_transform(y_train.detach().numpy())
     y_test_pred = scaler.inverse_transform(y_test_pred.detach().numpy())
-    y_test = scaler.inverse_transform(y_test_gru.detach().numpy())
+    y_test = scaler.inverse_transform(y_test.detach().numpy())
 
     # calculate root mean squared error
     trainScore = math.sqrt(mean_squared_error(
@@ -82,6 +81,7 @@ def train_GRU(x_train, x_test, y_train_lstm, y_test_lstm, y_train_gru, y_test_gr
     print('Test Score: %.2f RMSE' % (testScore))
     gru.append(trainScore)
     gru.append(testScore)
+
     gru.append(training_time)
 
     # shift train predictions for plotting
