@@ -8,61 +8,42 @@ import torch
 import torch.nn as nn
 from typing import Callable
 
+input_dim = 1
+hidden_dim = 32
+num_layers = 4
+output_dim = 1
 num_epochs = 100
 
 
-class MLP2D(nn.Module):
-    def __init__(self,
-                 num_layers: int,
-                 hidden_dim: int,
-                 activation: Callable[[torch.Tensor], torch.Tensor]
-                 ) -> None:
-        super().__init__()
+class MLP(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
+        super(MLP, self).__init__()
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
 
-        self.first_layer = nn.Linear(in_features=2,
-                                     out_features=hidden_dim)
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.act = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
 
-        # A list of modules: automatically exposes nested parameters to optimize.
-        self.layers = nn.ModuleList()
-        # Parameters contained in a normal python list are not returned by model.parameters()
-        for i in range(num_layers):
-            self.layers.append(
-                nn.Linear(in_features=hidden_dim, out_features=hidden_dim)
-            )
-        self.activation = activation
+    def forward(self, x):
 
-        self.last_layer = nn.Linear(in_features=hidden_dim,
-                                    out_features=1)
+        hidden = self.fc1(x)
+        relu = self.act(hidden)
+        output = self.fc2(relu[:, -1, :])
 
-    def forward(self, meshgrid: torch.Tensor) -> torch.Tensor:
-        """
-        Applies transformations to each (x, y) independently 
-
-        :param meshgrid: tensor of dimensions [..., 2], where ... means any number of dims
-        """
-        out = meshgrid
-
-        # First linear layer, transforms the hidden dimensions from 2 (the coordinates) to `hidden_dim`
-        out = self.first_layer(out)
-        for layer in self.layers:    # Apply `k` (linear, activation) layer
-            out = layer(out)
-            out = self.activation(out)
-        # Last linear layer to bring the `hiddem_dim` features back to the 2 coordinates x, y
-        out = self.last_layer(out)
-
-        return out.squeeze(-1)
+        return output
 
 
 def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
-    model = MLP2D(num_layers=3,
-                  hidden_dim=10,
-                  activation=torch.nn.functional.relu)
+
+    model = MLP(input_dim=input_dim, hidden_dim=hidden_dim,
+                output_dim=output_dim, num_layers=num_layers)
+    optimiser = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.MSELoss(reduction='mean')
-    optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
 
     hist = np.zeros(num_epochs)
     start_time = time.time()
-    lstm = []
+    mlp = []
 
     for t in range(num_epochs):
         y_train_pred = model(x_train)
@@ -79,8 +60,6 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     training_time = time.time()-start_time
     print("Training time: {}".format(training_time))
 
-    predict = pd.DataFrame(scaler.inverse_transform(
-        y_train_pred.detach().numpy()))
     original = pd.DataFrame(scaler.inverse_transform(
         y_train.detach().numpy()))
 
@@ -99,9 +78,9 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     print('Train Score: %.2f RMSE' % (trainScore))
     testScore = math.sqrt(mean_squared_error(y_test[:, 0], y_test_pred[:, 0]))
     print('Test Score: %.2f RMSE' % (testScore))
-    lstm.append(trainScore)
-    lstm.append(testScore)
-    lstm.append(training_time)
+    mlp.append(trainScore)
+    mlp.append(testScore)
+    mlp.append(training_time)
 
     # shift train predictions for plotting
     trainPredictPlot = np.empty_like(price)
@@ -164,7 +143,7 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     annotations = []
     annotations.append(dict(xref='paper', yref='paper', x=0.0, y=1.05,
                             xanchor='left', yanchor='bottom',
-                            text='Results (LSTM)',
+                            text='Results (mlp)',
                             font=dict(family='Rockwell',
                                       size=26,
                                       color='white'),
@@ -173,4 +152,4 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
 
     fig.show()
 
-    return lstm
+    return mlp

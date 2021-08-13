@@ -28,7 +28,11 @@ def load_plot():
         row += 1
     print(df.head())
     print()
+    df = df.drop('Date', axis=1)
+    return df
 
+
+'''
     # historical view of the closing price
 
     sns.set_style("darkgrid")
@@ -80,5 +84,5 @@ def load_plot():
     plt.tight_layout()
     plt.show()
 
-    df = df.drop('Date', axis=1)
-    return df
+    
+'''
