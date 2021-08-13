@@ -6,42 +6,54 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from typing import Callable
+import torch.nn.functional as F
 
 input_dim = 1
 hidden_dim = 32
-num_layers = 4
+num_layers = 3
 output_dim = 1
 num_epochs = 100
 
 
-class MLP(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_dim):
-        super(MLP, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
+# GAN
 
-        self.fc1 = nn.Linear(input_dim, hidden_dim)
-        self.act = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_dim, output_dim)
+class Generator(nn.Module):
+
+    def __init__(self, input_dim: int):
+
+        super(Generator, self).__init__()
+
+        self.dense_layer = nn.Linear(int(input_dim), int(input_dim))
+
+        self.activation = nn.Sigmoid()
 
     def forward(self, x):
-        hidden = self.fc1(x)
-        relu = self.act(hidden)
-        output = self.fc2(relu[:, -1, :])
-        return output
+
+        return self.activation(self.dense_layer(x))
 
 
-def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
+class Discriminator(nn.Module):
+    def __init__(self, input_dim: int):
+        super(Discriminator, self).__init__()
+        self.dense = nn.Linear(int(input_dim), 1)
+        self.activation = nn.Sigmoid()
 
-    model = MLP(input_dim=input_dim, hidden_dim=hidden_dim,
+    def forward(self, x):
+        return self.activation(self.dense(x))
+
+
+def train_GAN(x_train, x_test, y_train, y_test, scaler, price, lookback):
+    model = GAN(input_dim=input_dim, hidden_dim=hidden_dim,
                 output_dim=output_dim, num_layers=num_layers)
-    optimiser = torch.optim.Adam(model.parameters(), lr=0.001)
-    criterion = torch.nn.MSELoss(reduction='mean')
 
+    #generator = Generator(input_dim)
+    #discriminator = Discriminator(input_dim)
+
+    criterion = torch.nn.MSELoss(reduction='mean')
+    optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
     hist = np.zeros(num_epochs)
     start_time = time.time()
-    mlp = []
+    gan = []
 
     for t in range(num_epochs):
         y_train_pred = model(x_train)
@@ -58,6 +70,8 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     training_time = time.time()-start_time
     print("Training time: {}".format(training_time))
 
+    predict = pd.DataFrame(scaler.inverse_transform(
+        y_train_pred.detach().numpy()))
     original = pd.DataFrame(scaler.inverse_transform(
         y_train.detach().numpy()))
 
@@ -76,9 +90,9 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     print('Train Score: %.2f RMSE' % (trainScore))
     testScore = math.sqrt(mean_squared_error(y_test[:, 0], y_test_pred[:, 0]))
     print('Test Score: %.2f RMSE' % (testScore))
-    mlp.append(trainScore)
-    mlp.append(testScore)
-    mlp.append(training_time)
+    gan.append(trainScore)
+    gan.append(testScore)
+    gan.append(training_time)
 
     # shift train predictions for plotting
     trainPredictPlot = np.empty_like(price)
@@ -141,7 +155,7 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
     annotations = []
     annotations.append(dict(xref='paper', yref='paper', x=0.0, y=1.05,
                             xanchor='left', yanchor='bottom',
-                            text='Results (MLP)',
+                            text='Results (GAN)',
                             font=dict(family='Rockwell',
                                       size=26,
                                       color='white'),
@@ -150,4 +164,4 @@ def train_MLP(x_train, x_test, y_train, y_test, scaler, price, lookback):
 
     fig.show()
 
-    return mlp
+    return gan
