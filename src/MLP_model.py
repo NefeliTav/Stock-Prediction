@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from typing import Callable
 
 input_dim = 1
 hidden_dim = 32

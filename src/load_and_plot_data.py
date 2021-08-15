@@ -12,13 +12,18 @@ def to_days(then):
     return int(diff[0])
 
 
-def load_plot():
-    # load dataset
-
+def load_data():
     filepath = '../dataset/TSLA.csv'
     df = pd.read_csv(filepath)
+    return df
 
-    # get days since stoch price
+
+def load_plot():
+
+    # load dataset
+    df = load_data()
+
+    # get days since stock price
 
     df['Date'] = df['Date'].astype(str)
     df['Days'] = df['Date']
