@@ -4,10 +4,16 @@ from LSTM_model import train_LSTM
 from GRU_model import train_GRU
 from MLP_model import train_MLP
 from CNN_model import train_CNN
+from GAN_model import train_GAN
 
 
 if __name__ == "__main__":
     x_train, x_test, y_train, y_test, scaler, price, lookback = preprocess()
+
+    gan = train_GAN(x_train, x_test, y_train,
+                    y_test, scaler, price, lookback)
+
+    '''
 
     cnn = train_CNN(x_train, x_test, y_train,
                     y_test, scaler, price, lookback)
@@ -28,3 +34,4 @@ if __name__ == "__main__":
     print()
     print(result)
     print()
+    '''
