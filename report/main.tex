@@ -54,27 +54,30 @@ Fully-connected (FC) layer \\ \\
 The convolutional layer is the first layer of a convolutional network. While convolutional layers can be followed by additional convolutional layers or pooling layers, the fully-connected layer is the final layer. With each layer, the CNN increases in its complexity, identifying greater portions of the image. Earlier layers focus on simple features, such as colors and edges. As the image data progresses through the layers of the CNN, it starts to recognize larger elements or shapes of the object until it finally identifies the intended object
 
 \paragraph*{Recurrent Neural Network.}
-An RNN is a class of artificial neural networks where connections between nodes form a directed graph along a temporal sequence. This allows it to exhibit temporal dynamic behavior. Derived from feedforward neural networks, RNNs can use their internal state (memory) to process variable length sequences of inputs.[1][2][3] This makes them applicable to tasks such as unsegmented, connected handwriting recognition[4] or speech recognition.
+An RNN is a class of artificial neural networks where connections between nodes form a directed graph along a temporal sequence. This allows it to exhibit temporal dynamic behavior. Derived from feedforward neural networks, RNNs can use their internal state (memory) to process variable length sequences of inputs. This makes them applicable to tasks such as unsegmented, connected handwriting recognition or speech recognition.
 
 \paragraph*{Long Short-Term Memory.}
-LSTM is an artificial recurrent neural network (RNN) architecture[1] used in the field of deep learning. Unlike standard feedforward neural networks, LSTM has feedback connections.A common LSTM unit is composed of a cell, an input gate, an output gate and a forget gate. The cell remembers values over arbitrary time intervals and the three gates regulate the flow of information into and out of the cell.
+LSTM is an artificial recurrent neural network (RNN) architecture used in the field of deep learning. Unlike standard feedforward neural networks, LSTM has feedback connections.A common LSTM unit is composed of a cell, an input gate, an output gate and a forget gate. The cell remembers values over arbitrary time intervals and the three gates regulate the flow of information into and out of the cell.
 
 LSTM networks are well-suited to classifying, processing and making predictions based on time series data, since there can be lags of unknown duration between important events in a time series. LSTMs were developed to deal with the vanishing gradient problem that can be encountered when training traditional RNNs. Relative insensitivity to gap length is an advantage of LSTM over RNNs, hidden Markov models and other sequence learning methods in numerous applications.
 
 \paragraph*{Gated Recurrent Unit.}
-GRUs are a gating mechanism in recurrent neural networks, introduced in 2014 by Kyunghyun Cho et al.The GRU is like a long short-term memory (LSTM) with a forget gate, but has fewer parameters than LSTM, as it lacks an output gate.GRU's performance on certain tasks of polyphonic music modeling, speech signal modeling and natural language processing was found to be similar to that of LSTM.GRUs have been shown to exhibit better performance on certain smaller and less frequent datasets.
+GRUs are a gating mechanism in recurrent neural networksThe GRU is like a long short-term memory (LSTM) with a forget gate, but has fewer parameters than LSTM, as it lacks an output gate.GRU's performance on certain tasks of polyphonic music modeling, speech signal modeling and natural language processing was found to be similar to that of LSTM.GRUs have been shown to exhibit better performance on certain smaller and less frequent datasets.
+
+\paragraph*{Rectifier Linear Unit.}
+In the context of artificial neural networks, the rectifier or ReLU activation function is an activation function defined as the positive part of its argument:
+
+{\displaystyle f(x)=x^{+}=\max(0,x)}
 
 \section{Tools}
-- PyTorch
-- Pandas
-- NumPy
-- Plotly
-- DVC
+PyTorch 
+- Pandas 
+- NumPy 
+- Plotly 
+- DVC 
 
 \section{Results}\label{sec:latex}
 
-
-\paragraph*{Table.}
 
 \begin{table}[h!]
 \caption{Performance comparison.}
@@ -98,21 +101,28 @@ Train Time & 0.399081 &  1.096348 & 17.377151 & 10.162085 \\
 \end{table}
 
 \section{Conclusion}
-
+TODO
 
 
 \section{References}
 
-\url{https://towardsdatascience.com/3-facts-about-time-series-forecasting-that-surprise-experienced-machine-learning-practitioners-69c18ee89387}
 
-\url{https://www.tutorialspoint.com/artificial_intelligence/artificial_intelligence_neural_networks.html}
+\textit{\url{https://www.tutorialspoint.com/artificial_intelligence/artificial_intelligence_neural_networks.html}}
 
-\url{https://en.wikipedia.org/wiki/Recurrent_neural_network}
+\textit{\url{https://en.wikipedia.org/wiki/Recurrent_neural_network}}
 
-\url{https://en.wikipedia.org/wiki/Long_short-term_memory}
+\textit{\url{https://en.wikipedia.org/wiki/Long_short-term_memory}}
 
-\url{https://en.wikipedia.org/wiki/Gated_recurrent_unit}
+\textit{\url{https://en.wikipedia.org/wiki/Gated_recurrent_unit}}
 
-\url{https://www.ibm.com/cloud/learn/convolutional-neural-networks}
+\textit{\url{https://www.ibm.com/cloud/learn/convolutional-neural-networks}}
+
+\textit{\url{https://en.wikipedia.org/wiki/Rectifier_(neural_networks)}}
+
+\textit{\url{https://medium.com/swlh/stock-price-prediction-with-pytorch-37f52ae84632}}
+
+\textit{\url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}
+
+\textit{\url{https://www.kaggle.com/faressayah/stock-market-analysis-prediction-using-lstm}}
 \end{document}
 

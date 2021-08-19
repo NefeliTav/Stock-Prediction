@@ -37,7 +37,7 @@ def load_plot():
     return df
 
 
-'''
+
     # historical view of the closing price
 
     sns.set_style("darkgrid")
@@ -90,4 +90,3 @@ def load_plot():
     plt.show()
 
     
-'''
