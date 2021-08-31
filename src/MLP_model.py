@@ -11,7 +11,7 @@ input_dim = 1
 hidden_dim = 32
 num_layers = 4
 output_dim = 1
-num_epochs = 100
+num_epochs = 200
 
 
 class MLP(nn.Module):

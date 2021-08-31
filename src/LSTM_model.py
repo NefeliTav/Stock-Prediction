@@ -10,9 +10,9 @@ import torch.nn as nn
 
 input_dim = 1
 hidden_dim = 32
-num_layers = 3
+num_layers = 4
 output_dim = 1
-num_epochs = 100
+num_epochs = 200
 
 
 # LSTM
@@ -42,8 +42,8 @@ def train_LSTM(x_train, x_test, y_train, y_test, scaler, price, lookback):
     model = LSTM(input_dim=input_dim, hidden_dim=hidden_dim,
                  output_dim=output_dim, num_layers=num_layers)
     criterion = torch.nn.MSELoss(reduction='mean')
-    #criterion = nn.CrossEntropyLoss()
     optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
+
     #optimiser = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.1, weight_decay=1e-5)
     #optimiser = torch.optim.LBFGS(model.parameters(), lr=0.01)
     hist = np.zeros(num_epochs)

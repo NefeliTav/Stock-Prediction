@@ -10,9 +10,9 @@ import torch.nn as nn
 
 input_dim = 1
 hidden_dim = 32
-num_layers = 2
+num_layers = 3
 output_dim = 1
-num_epochs = 100
+num_epochs = 250
 
 # GRU
 

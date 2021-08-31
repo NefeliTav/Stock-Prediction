@@ -53,6 +53,10 @@ Pooling layer \\
 Fully-connected (FC) layer \\ \\
 The convolutional layer is the first layer of a convolutional network. While convolutional layers can be followed by additional convolutional layers or pooling layers, the fully-connected layer is the final layer. With each layer, the CNN increases in its complexity, identifying greater portions of the image. Earlier layers focus on simple features, such as colors and edges. As the image data progresses through the layers of the CNN, it starts to recognize larger elements or shapes of the object until it finally identifies the intended object
 
+Key properties of CNNs :
+
+Trasnslation Equivariance - Compositionality - Locality - Self-Similarity
+
 \paragraph*{Recurrent Neural Network.}
 An RNN is a class of artificial neural networks where connections between nodes form a directed graph along a temporal sequence. This allows it to exhibit temporal dynamic behavior. Derived from feedforward neural networks, RNNs can use their internal state (memory) to process variable length sequences of inputs. This makes them applicable to tasks such as unsegmented, connected handwriting recognition or speech recognition.
 
@@ -68,6 +72,36 @@ GRUs are a gating mechanism in recurrent neural networksThe GRU is like a long s
 In the context of artificial neural networks, the rectifier or ReLU activation function is an activation function defined as the positive part of its argument:
 
 {\displaystyle f(x)=x^{+}=\max(0,x)}
+
+
+\paragraph*{Backpropagation.}
+Calculating gradients.
+
+\paragraph*{Optimization.}
+Optimizers are algorithms or methods used to change the attributes of the neural network such as weights and learning rate to reduce the losses. Examples of optimizers :
+
+GD
+- SGD
+- MB-SGD
+- SGD with momentum
+- AdaGrad
+- AdaDelta
+- Adam
+
+All in all, Adam is considered the best algorithm
+
+
+\paragraph*{Regularization.}
+Regularization refers to a set of different techniques that lower the complexity of a neural network model during training, and thus prevent the overfitting. Examples of regularization :
+
+- L1 regularization forces the weight parameters to become zero
+
+- L2 regularization forces the weight parameters towards zero (but never exactly zero)
+
+- During dropout, some neurons get deactivated with a random probability P → Neural network becomes less complex → less overfitting
+
+\paragraph*{Early Stopping.}
+Stop training as soon as performance on validation set decreases. This is where the network starts to overfit the training set.
 
 \section{Tools}
 PyTorch 
@@ -88,20 +122,17 @@ PyTorch
 
 & \multirow{1}{0.1\linewidth}{MLP}& \multirow{1}{0.1\linewidth}{CNN}& \multirow{1}{0.1\linewidth}{LSTM}& \multirow{1}{0.1\linewidth}{GRU}\\
 \toprule
-Train RMSE & 37.585734 &  5.817905 & 10.604635 &  5.883437\\
+Train RMSE & 6.938163  & 5.579548 &  6.192757 &  2.195456\\
 \midrule
-Test RMSE      & 66.905527 & 45.338950 & 70.779618 & 32.251542\\
+Test RMSE      & 51.058610 & 42.077173 & 59.642715 & 13.554291\\
 \midrule
-Train Time & 0.399081 &  1.096348 & 17.377151 & 10.162085 \\
+Train Time & 1.605949 &  1.977534 & 63.438091 &  47.674628 \\
 \bottomrule
 \end{tabular}
 \end{small}
 \end{center}
 \vspace{-0.5cm}
 \end{table}
-
-\section{Conclusion}
-TODO
 
 
 \section{References}
@@ -124,5 +155,11 @@ TODO
 \textit{\url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}
 
 \textit{\url{https://www.kaggle.com/faressayah/stock-market-analysis-prediction-using-lstm}}
+
+\textit{\url{https://towardsdatascience.com/7-tips-to-choose-the-best-optimizer-47bb9c1219e}}
+
+\textit{\url{https://towardsdatascience.com/overview-of-various-optimizers-in-neural-networks-17c1be2df6d5}}
+
+\textit{\url{https://towardsdatascience.com/regularization-in-deep-learning-l1-l2-and-dropout-377e75acc036}}
 \end{document}
 

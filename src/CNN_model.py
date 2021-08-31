@@ -9,9 +9,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 input_dim = 19
-hidden_dim = 1
+hidden_dim = 64
 output_dim = 1
-num_epochs = 100
+num_epochs = 200
 
 
 # CNN
@@ -28,6 +28,8 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(input_dim, input_dim)
         self.fc2 = nn.Linear(input_dim, output_dim)
 
+        self.dropout = nn.Dropout(0.00001)
+
     def forward(self, x):
 
         x = self.conv1(x)
@@ -41,6 +43,7 @@ class CNN(nn.Module):
         x = x.view(x.shape[0], -1)
         x = self.fc1(x)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.fc2(x)
         return x
 
@@ -50,6 +53,7 @@ def train_CNN(x_train, x_test, y_train, y_test, scaler, price, lookback):
                 output_dim=output_dim)
     criterion = torch.nn.MSELoss(reduction='mean')
     optimiser = torch.optim.Adam(model.parameters(), lr=0.01)
+
     hist = np.zeros(num_epochs)
     start_time = time.time()
     cnn = []
